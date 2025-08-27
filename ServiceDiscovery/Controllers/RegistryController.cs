@@ -31,7 +31,14 @@ public class RegistryController : ControllerBase
     [HttpGet("discover")]
     public IActionResult DiscoverService([FromQuery] string serviceName)
     {
-        var urls = _serviceRegistry.GetServiceUrls(serviceName);
+        var urls = _serviceRegistry.DiscoverServices(serviceName);
         return Ok(urls);
+    }
+
+    [HttpPost("heartbeat")]
+    public IActionResult Heartbeat([FromQuery] string serviceName, [FromQuery] string serviceUrl)
+    {
+        _serviceRegistry.Heartbeat(serviceName, serviceUrl);
+        return Ok($"Heartbeat received from {serviceName} at {serviceUrl}");
     }
 }

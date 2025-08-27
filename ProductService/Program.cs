@@ -28,6 +28,15 @@ builder.Services.AddHostedService(provider =>
 
 var app = builder.Build();
 
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("./swagger/v1/swagger.json", "API v1"); // Usa "./" para compatibilidad
+    c.RoutePrefix = string.Empty;
+    c.DisplayRequestDuration(); // Opcional: muestra tiempo de respuesta
+});
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
