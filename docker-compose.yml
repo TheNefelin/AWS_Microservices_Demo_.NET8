@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  service-discovery:
+    build:
+      context: .
+      dockerfile: ServiceDiscovery/Dockerfile
+    ports:
+      - "5000:80"
+    networks:
+      - microservices-network
+
+  product-service:
+    build:
+      context: .
+      dockerfile: ProductService/Dockerfile
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+      - ServiceDiscoveryUrl=http://service-discovery:80
+    depends_on:
+      - service-discovery
+    networks:
+      - microservices-network
+
+  order-service:
+    build:
+      context: .
+      dockerfile: OrderService/Dockerfile
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+      - ServiceDiscoveryUrl=http://service-discovery:80
+    depends_on:
+      - service-discovery
+    networks:
+      - microservices-network
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ApiGateway/Dockerfile
+    ports:
+      - "5003:80"
+    environment:
+      - ServiceDiscoveryUrl=http://service-discovery:80
+    depends_on:
+      - service-discovery
+      - product-service
+      - order-service
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
