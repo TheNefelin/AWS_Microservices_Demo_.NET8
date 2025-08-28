@@ -1,0 +1,17 @@
+# .dockerignore
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+**/.git/
+**/node_modules/
+**/.dockerignore
+**/Dockerfile
+**/docker-compose.yml
+*.log
+*.ttf
+*.cache
+.DS_Store
+.dockerignore
+.gitignore
+README.md

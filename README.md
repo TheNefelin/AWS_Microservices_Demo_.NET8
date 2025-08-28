@@ -109,13 +109,27 @@ dotnet run --urls "http://localhost:5003"
 
 2. Script de Inicio Automático
 ```sh
-# Ejecutar el script start-all.ps1
-.\start-all.ps1
+# Ejecutar el script start-all.bat
+.\start-all.bat
 ```
 
-3. Docker Compose (Próximamente)
+3. Docker Compose
+- Construir y ejecutar todos los servicios
 ```sh
 docker-compose up --build
+```
+- logs
+```sh
+docker-compose logs -f
+docker-compose logs -f api-gateway
+```
+- Detener servicios
+```sh
+docker-compose down
+```
+- Detener servicios
+```sh
+docker-compose up -d --build product-service
 ```
 
 ## 🔍 Endpoints Disponibles
