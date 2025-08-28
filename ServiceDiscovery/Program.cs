@@ -32,6 +32,9 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+// 🔥 AGREGAR ENDPOINT HEALTH - IMPORTANTE PARA DOCKER COMPOSE
+app.MapGet("/health", () => "ServiceDiscovery is healthy");
+
 app.MapControllers();
 
 app.Run();
