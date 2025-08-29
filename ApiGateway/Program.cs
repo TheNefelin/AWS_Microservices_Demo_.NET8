@@ -3,12 +3,20 @@
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddHttpClient();
+var serviceUrl = builder.Configuration["ASPNETCORE_URLS"] ?? "http://localhost:5003";
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// 🔥 OBTENER LAS URLs DESDE CONFIGURACIÓN (appsettings.json o variables de entorno)
+var productServiceUrl = builder.Configuration["Services:ProductService:Url"] ?? "http://localhost:5001";
+var orderServiceUrl = builder.Configuration["Services:OrderService:Url"] ?? "http://localhost:5002";
+
+Console.WriteLine($"🚀 Product Service URL: {productServiceUrl}");
+Console.WriteLine($"🚀 Order Service URL: {orderServiceUrl}");
+
 
 // Configuración de rutas para el reverse proxy
 var routes = new[]
@@ -17,23 +25,23 @@ var routes = new[]
     {
         RouteId = "products-route",
         ClusterId = "products-cluster",
-        Match = new RouteMatch 
-        { 
-            Path = "/api/products/{**catch-all}" 
+        Match = new RouteMatch
+        {
+            Path = "/api/products/{**catch-all}"
         }
     },
     new RouteConfig
     {
         RouteId = "orders-route",
         ClusterId = "orders-cluster",
-        Match = new RouteMatch 
-        { 
-            Path = "/api/orders/{**catch-all}" 
+        Match = new RouteMatch
+        {
+            Path = "/api/orders/{**catch-all}"
         }
     }
 };
 
-// Configuración de clusters para los servicios
+// 🔥 CONFIGURACIÓN DINÁMICA DE CLUSTERS
 var clusters = new[]
 {
     new ClusterConfig
@@ -45,7 +53,7 @@ var clusters = new[]
                 "destination1",
                 new DestinationConfig
                 {
-                    Address = "http://localhost:5001/"
+                    Address = productServiceUrl.EndsWith("/") ? productServiceUrl : $"{productServiceUrl}/"
                 }
             }
         }
@@ -59,7 +67,7 @@ var clusters = new[]
                 "destination1",
                 new DestinationConfig
                 {
-                    Address = "http://localhost:5002/"
+                    Address = orderServiceUrl.EndsWith("/") ? orderServiceUrl : $"{orderServiceUrl}/"
                 }
             }
         }

@@ -11,10 +11,11 @@ services:
       - microservices-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/health || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 40s
 
   product-service:
     build:
@@ -26,15 +27,17 @@ services:
       - ServiceDiscoveryUrl=http://service-discovery:5000
       - ASPNETCORE_URLS=http://+:5001
     depends_on:
-      - service-discovery
+      service-discovery:
+        condition: service_healthy
     networks:
       - microservices-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost:5001/health || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 40s
 
   order-service:
     build:
@@ -46,15 +49,17 @@ services:
       - ServiceDiscoveryUrl=http://service-discovery:5000
       - ASPNETCORE_URLS=http://+:5002
     depends_on:
-      - service-discovery
+      service-discovery:
+        condition: service_healthy
     networks:
       - microservices-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5002/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost:5002/health || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 40s
 
   api-gateway:
     build:
@@ -66,21 +71,22 @@ services:
       - ServiceDiscoveryUrl=http://service-discovery:5000
       - ASPNETCORE_URLS=http://+:5003
     depends_on:
-      - service-discovery
-      - product-service
-      - order-service
+      service-discovery:
+        condition: service_healthy
+      product-service:
+        condition: service_healthy
+      order-service:
+        condition: service_healthy
     networks:
       - microservices-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5003/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost:5003/health || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 40s
 
 networks:
   microservices-network:
     driver: bridge
-
-volumes:
-  app-data:

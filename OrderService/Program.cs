@@ -28,6 +28,9 @@ builder.Services.AddHostedService(provider =>
 
 var app = builder.Build();
 
+// 🔥 AGREGAR ENDPOINT HEALTH
+app.MapGet("/health", () => "OrderService is healthy");
+
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -44,12 +47,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
-// 🔥 AGREGAR ENDPOINT HEALTH
-app.MapGet("/health", () => "OrderService is healthy");
-
 app.MapControllers();
-
 app.Run();

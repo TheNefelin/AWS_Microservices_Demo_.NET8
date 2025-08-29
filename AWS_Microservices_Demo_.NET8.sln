@@ -5,11 +5,9 @@ VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
-		.dockerignore = .dockerignore
 		docker-compose.yml = docker-compose.yml
 		README.md = README.md
 		start-all.bat = start-all.bat
-		start-all.sh = start-all.sh
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedModels", "SharedModels\SharedModels.csproj", "{6028C148-B4A3-4154-B00E-EED33F58C4B4}"

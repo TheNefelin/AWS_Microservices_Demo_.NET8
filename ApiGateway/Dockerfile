@@ -1,9 +1,8 @@
-# ApiGateway/Dockerfile
+# ===== ApiGateway/Dockerfile =====
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 5003
 ENV ASPNETCORE_URLS=http://+:5003
-ENV ServiceDiscoveryUrl=http://service-discovery:5000
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src

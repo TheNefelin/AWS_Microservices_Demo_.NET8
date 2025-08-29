@@ -3,6 +3,8 @@
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var serviceUrl = builder.Configuration["ASPNETCORE_URLS"] ?? "http://localhost:5000";
+
 builder.Services.AddSingleton<IServiceRegistry, InMemoryServiceRegistry>();
 builder.Services.AddHostedService<RegistryCleanupService>();
 
@@ -12,6 +14,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// 🔥 AGREGAR ENDPOINT HEALTH - IMPORTANTE PARA DOCKER COMPOSE
+app.MapGet("/health", () => "ServiceDiscovery is healthy");
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
@@ -29,12 +34,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
-// 🔥 AGREGAR ENDPOINT HEALTH - IMPORTANTE PARA DOCKER COMPOSE
-app.MapGet("/health", () => "ServiceDiscovery is healthy");
-
 app.MapControllers();
-
 app.Run();

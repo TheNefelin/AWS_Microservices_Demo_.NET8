@@ -28,6 +28,9 @@ builder.Services.AddHostedService(provider =>
 
 var app = builder.Build();
 
+// 🔥 AGREGAR ENDPOINT HEALTH
+app.MapGet("/health", () => "OrderService is healthy");
+
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -35,7 +38,6 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = string.Empty;
     c.DisplayRequestDuration(); // Opcional: muestra tiempo de respuesta
 });
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -45,12 +47,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
-// 🔥 AGREGAR ENDPOINT HEALTH
-app.MapGet("/health", () => "OrderService is healthy");
-
 app.MapControllers();
-
 app.Run();

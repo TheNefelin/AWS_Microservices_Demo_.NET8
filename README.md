@@ -90,21 +90,17 @@ graph TB
 ## 🚀 Cómo Ejecutar
 1. Ejecución Manual (Recomendado para desarrollo)
 ```sh
-# Terminal 1 - Service Discovery
-cd ServiceDiscovery
-dotnet run --urls "http://localhost:5000"
+cd AWS_Microservices_Demo_.NET8
 
-# Terminal 2 - Product Service
-cd ProductService
-dotnet run --urls "http://localhost:5001"
+dotnet run --project ServiceDiscovery\ServiceDiscovery.csproj
+dotnet run --project ProductService\ProductService.csproj
+dotnet run --project OrderService\OrderService.csproj
+dotnet run --project ApiGateway\ApiGateway.csproj
 
-# Terminal 3 - Order Service
-cd OrderService
-dotnet run --urls "http://localhost:5002"
-
-# Terminal 4 - API Gateway (esperar 5 segundos)
-cd ApiGateway
-dotnet run --urls "http://localhost:5003"
+dotnet run --project ServiceDiscovery\ServiceDiscovery.csproj --urls http://localhost:5000
+dotnet run --project ProductService\ProductService.csproj --urls http://localhost:5001
+dotnet run --project OrderService\OrderService.csproj --urls http://localhost:5002
+dotnet run --project ApiGateway\ApiGateway.csproj --urls http://localhost:5003
 ```
 
 2. Script de Inicio Automático
@@ -112,11 +108,61 @@ dotnet run --urls "http://localhost:5003"
 # Ejecutar el script start-all.bat
 .\start-all.bat
 ```
+```bat
+@echo off
+echo Starting Microservices...
+
+echo Starting Service Discovery on port 5000...
+start "ServiceDiscovery" dotnet run --project ServiceDiscovery\ServiceDiscovery.csproj --urls http://localhost:5000
+timeout /t 2 /nobreak >nul
+
+echo Starting Product Service on port 5001...
+start "ProductService" dotnet run --project ProductService\ProductService.csproj --urls http://localhost:5001
+timeout /t 2 /nobreak >nul
+
+echo Starting Order Service on port 5002...
+start "OrderService" dotnet run --project OrderService\OrderService.csproj --urls http://localhost:5002
+timeout /t 2 /nobreak >nul
+
+echo Waiting for services to start...
+timeout /t 5 /nobreak >nul
+
+echo Starting API Gateway on port 5003...
+start "ApiGateway" dotnet run --project ApiGateway\ApiGateway.csproj --urls http://localhost:5003
+
+echo All services are starting...
+echo Service Discovery: http://localhost:5000
+echo Product Service: http://localhost:5001
+echo Order Service: http://localhost:5002
+echo API Gateway: http://localhost:5003
+echo.
+echo Press any key to stop all services...
+pause >nul
+
+echo Stopping all services...
+taskkill /f /im dotnet.exe >nul 2>&1
+echo All services stopped.
+```
 
 3. Docker Compose
 - Construir y ejecutar todos los servicios
 ```sh
+# Limpiar todo
+docker-compose down -v
+docker system prune -f
+
+# Reconstruir y levantar
 docker-compose up --build
+
+# Verificar que todo esté funcionando
+curl http://localhost:5000/health    # ServiceDiscovery
+curl http://localhost:5001/health    # ProductService  
+curl http://localhost:5002/health    # OrderService
+curl http://localhost:5003/health    # ApiGateway
+
+# Probar a través del gateway
+curl http://localhost:5003/api/products
+curl http://localhost:5003/api/orders
 ```
 - logs
 ```sh
@@ -130,6 +176,36 @@ docker-compose down
 - Detener servicios
 ```sh
 docker-compose up -d --build product-service
+```
+
+3. Docker independenciete por servicio
+- Service Discovery
+```sh
+docker build -f ServiceDiscovery/Dockerfile -t service-discovery:1.0 .
+```
+```sh
+docker run -d -p 5000:5000 --name service-discovery-container service-discovery:1.0
+```
+- Product Service
+```sh
+docker build -f ProductService/Dockerfile -t product-service:1.0 .
+```
+```sh
+docker run -d -p 5001:5001 --name product-service-container -e ServiceDiscoveryUrl=http://host.docker.internal:5000 product-service:1.0
+```
+- Order Service
+```sh
+docker build -f OrderService/Dockerfile -t order-service:1.0 .
+```
+```sh
+docker run -d -p 5002:5002 --name order-service-container -e ServiceDiscoveryUrl=http://host.docker.internal:5000 order-service:1.0
+```
+- API Gateway
+```sh
+docker build -f ApiGateway/Dockerfile -t api-gateway:1.0 .
+```
+```sh
+docker run -d -p 5003:5003 --name api-gateway-container -e ServiceDiscoveryUrl=http://host.docker.internal:5000 api-gateway:1.0
 ```
 
 ## 🔍 Endpoints Disponibles
@@ -177,16 +253,6 @@ docker-compose up -d --build product-service
 
 
 ## 🧪 Pruebas y Verificación
-
-- Script de Pruebas Automáticas
-```sh
-# Ejecutar tests completos
-.\test-all.ps1
-
-# O pruebas individuales
-.\test-services.ps1
-.\diagnose-order.ps1
-```
 
 - Verificación Manual
 ```sh
