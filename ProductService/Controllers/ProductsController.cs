@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProductService.Services;
-using SharedModels;
+using SharedModels.Models;
 
 namespace ProductService.Controllers;
 

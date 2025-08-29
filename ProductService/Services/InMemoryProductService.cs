@@ -1,4 +1,4 @@
-﻿using SharedModels;
+﻿using SharedModels.Models;
 
 namespace ProductService.Services;
 
